@@ -27,7 +27,10 @@ const Usuario = connection.define(
       allowNull: false,
     },
     cpf: {
-      type: STRING(11),
+      type: STRING,
+      validate: {
+        len: [11, 11],
+      },
       allowNull: false,
       unique: true,
     },
