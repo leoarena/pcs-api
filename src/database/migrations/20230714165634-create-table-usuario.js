@@ -33,7 +33,10 @@ module.exports = {
         allowNull: false,
       },
       cpf: {
-        type: Sequelize.STRING(11),
+        type: Sequelize.STRING,
+        validate: {
+          len: [11, 11],
+        },
         allowNull: false,
         unique: true,
       },
