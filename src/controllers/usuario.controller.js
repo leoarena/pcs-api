@@ -80,8 +80,6 @@ class UsuarioController {
         .status(201)
         .send({ message: "Usuário cadastrado com sucesso.", novoUsuario });
     } catch (error) {
-      console.log(error.message);
-
       return response.status(400).send({
         message: "Não foi possível cadastrar o usuário.",
         cause: error.message,
@@ -123,11 +121,67 @@ class UsuarioController {
         .status(200)
         .send({ message: "Login efetuado com sucesso.", token });
     } catch (error) {
-      console.log(error.message);
-
       return response
         .status(400)
         .send({ message: "Erro ao efetuar login.", cause: error.message });
+    }
+  }
+
+  async updateOneUsuario(request, response) {
+    try {
+      const { identificador } = request.params;
+      const { nome, sobrenome, genero, telefone } = request.body;
+
+      const usuario = await Usuario.findOne({ where: { identificador } });
+      if (!usuario)
+        return response
+          .status(404)
+          .send({ message: "Usuário não encontrado." });
+
+      if (!nome && !sobrenome && !genero && !telefone)
+        return response
+          .status(400)
+          .send({ message: "Pelo menos um dos campos deve ser editado." });
+
+      const nomeValido =
+        typeof nome === "string" || typeof nome === "undefined";
+      if (!nomeValido)
+        return response
+          .status(400)
+          .send({ message: "O campo nome precisa ser do tipo string." });
+
+      const sobrenomeValido =
+        typeof sobrenome === "string" || typeof sobrenome === "undefined";
+      if (!sobrenomeValido)
+        return response
+          .status(400)
+          .send({ message: "O campo sobrenome precisa ser do tipo string." });
+
+      const generoValido =
+        typeof genero === "string" || typeof genero === "undefined";
+      if (!generoValido)
+        return response
+          .status(400)
+          .send({ message: "O campo genero precisa ser do tipo string." });
+
+      const telefoneValido =
+        typeof telefone === "string" || typeof telefone === "undefined";
+      if (!telefoneValido)
+        return response
+          .status(400)
+          .send({ message: "O campo telefone precisa ser do tipo string." });
+
+      await usuario.update(
+        { nome, sobrenome, genero, telefone },
+        { where: { identificador } }
+      );
+
+      return response.status(204).send();
+    } catch (error) {
+      return response.status(400).send({
+        message: "Não foi possível atualizar o usuário.",
+        cause: error.message,
+      });
     }
   }
 }
