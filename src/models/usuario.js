@@ -47,6 +47,7 @@ const Usuario = connection.define(
     email: {
       type: STRING,
       allowNull: false,
+      unique: true,
       validate: {
         isEmail: true,
       },
