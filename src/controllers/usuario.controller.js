@@ -1,5 +1,6 @@
 const { sign } = require("jsonwebtoken");
 const { Usuario } = require("../models/usuario");
+const { secret } = require("../config/database.config");
 
 class UsuarioController {
   async createOneUsuario(request, response) {
@@ -116,7 +117,7 @@ class UsuarioController {
         nome: usuario.nome,
       };
 
-      const token = sign(payload, process.env.SECRET, { expiresIn: "1d" });
+      const token = sign(payload, secret, { expiresIn: "1d" });
 
       return response
         .status(200)
