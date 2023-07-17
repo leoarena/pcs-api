@@ -1,3 +1,4 @@
+const { sign } = require("jsonwebtoken");
 const { Usuario } = require("../models/usuario");
 
 class UsuarioController {
@@ -44,6 +45,10 @@ class UsuarioController {
           .status(400)
           .send({ message: "O campo email é obrigatório." });
 
+      const emailExistente = await Usuario.findOne({ where: { email } });
+      if (emailExistente)
+        return response.status(409).send({ message: "Email já cadastrado." });
+
       if (!senha)
         return response
           .status(400)
@@ -58,7 +63,7 @@ class UsuarioController {
             "A senha deve ter no mínimo 8 caracteres, sendo pelo menos 1 letra maiúscula, 1 número e 1 caractere especial.",
         });
 
-      const data = await Usuario.create({
+      const novoUsuario = await Usuario.create({
         nome,
         sobrenome,
         genero,
@@ -72,7 +77,7 @@ class UsuarioController {
 
       return response
         .status(201)
-        .send({ message: "Usuário cadastrado com sucesso.", data });
+        .send({ message: "Usuário cadastrado com sucesso.", novoUsuario });
     } catch (error) {
       console.log(error.message);
 
@@ -80,6 +85,48 @@ class UsuarioController {
         message: "Não foi possível cadastrar o usuário.",
         cause: error.message,
       });
+    }
+  }
+
+  async loginUsuario(request, response) {
+    try {
+      const { email, senha } = request.body;
+
+      if (!email)
+        return response
+          .status(400)
+          .send({ message: "O campo email é obrigatório." });
+
+      if (!senha)
+        return response
+          .status(400)
+          .send({ message: "O campo senha é obrigatório." });
+
+      const usuario = await Usuario.findOne({ where: { email } });
+      if (!usuario)
+        return response.status(404).send({ message: "Email não encontrado." });
+
+      const senhaCorreta = senha === usuario.senha;
+      if (!senhaCorreta)
+        return response.status(400).send({ message: "Senha incorreta." });
+
+      const payload = {
+        identificador: usuario.identificador,
+        email: usuario.email,
+        nome: usuario.nome,
+      };
+
+      const token = sign(payload, process.env.SECRET, { expiresIn: "1d" });
+
+      return response
+        .status(200)
+        .send({ message: "Login efetuado com sucesso.", token });
+    } catch (error) {
+      console.log(error.message);
+
+      return response
+        .status(400)
+        .send({ message: "Erro ao efetuar login.", cause: error.message });
     }
   }
 }
