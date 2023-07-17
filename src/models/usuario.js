@@ -1,9 +1,15 @@
 const { connection } = require("../database/connection");
-const { STRING, DATEONLY, ENUM, DATE } = require("sequelize");
+const { INTEGER, STRING, DATEONLY, ENUM, DATE } = require("sequelize");
 
 const Usuario = connection.define(
-  "Usuario",
+  "usuario",
   {
+    identificador: {
+      type: INTEGER,
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     nome: {
       type: STRING,
       allowNull: false,
@@ -28,11 +34,11 @@ const Usuario = connection.define(
     },
     cpf: {
       type: STRING,
+      allowNull: false,
+      unique: true,
       validate: {
         len: [11, 11],
       },
-      allowNull: false,
-      unique: true,
     },
     telefone: {
       type: STRING,
