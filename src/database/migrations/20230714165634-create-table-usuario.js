@@ -3,8 +3,8 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Usuario", {
-      id: {
+    await queryInterface.createTable("usuarios", {
+      identificador: {
         type: Sequelize.INTEGER,
         allowNull: false,
         autoIncrement: true,
@@ -28,17 +28,17 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      dataNascimento: {
+      data_nascimento: {
         type: Sequelize.DATEONLY,
         allowNull: false,
       },
       cpf: {
         type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
         validate: {
           len: [11, 11],
         },
-        allowNull: false,
-        unique: true,
       },
       telefone: {
         type: Sequelize.STRING,
@@ -60,15 +60,15 @@ module.exports = {
         allowNull: false,
         defaultValue: "Ativo",
       },
-      createdAt: {
+      created_at: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      updatedAt: {
+      updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      deletedAt: {
+      deleted_at: {
         type: Sequelize.DATE,
         allowNull: true,
       },
@@ -76,6 +76,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Usuario");
+    await queryInterface.dropTable("usuarios");
   },
 };
