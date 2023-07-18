@@ -1,7 +1,6 @@
 const { sign } = require("jsonwebtoken");
 const { Usuario } = require("../models/usuario");
 const { secret } = require("../config/database.config");
-const { where } = require("sequelize");
 
 class UsuarioController {
   async createOneUsuario(request, response) {
@@ -253,6 +252,28 @@ class UsuarioController {
         cause: message.error,
       });
     }
+  }
+
+  async listOneUsuario(request, response) {
+    const { identificador } = request.params;
+    const usuario = await Usuario.findOne({
+      where: { identificador },
+      attributes: [
+        "identificador",
+        "nome",
+        "sobrenome",
+        "genero",
+        "dataNascimento",
+        "cpf",
+        "telefone",
+        "email",
+        "status",
+      ],
+    });
+
+    if (!usuario)
+      return response.status(404).send({ message: "Usuário não encontrado." });
+    else return response.status(200).send(usuario);
   }
 }
 

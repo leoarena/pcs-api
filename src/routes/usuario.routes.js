@@ -4,6 +4,7 @@ const {
   updateOneUsuario,
   updateStatus,
   updateSenha,
+  listOneUsuario,
 } = require("../controllers/usuario.controller");
 const { Router } = require("express");
 const { auth } = require("../middlewares/auth");
@@ -16,6 +17,7 @@ class UsuarioRouter {
     usuarioRoutes.patch("/usuarios/:identificador", auth, updateOneUsuario);
     usuarioRoutes.patch("/usuarios/:identificador/status", auth, updateStatus);
     usuarioRoutes.patch("/usuarios/:identificador/senha", auth, updateSenha);
+    usuarioRoutes.get("/usuarios/:identificador", auth, listOneUsuario);
     return usuarioRoutes;
   }
 }
