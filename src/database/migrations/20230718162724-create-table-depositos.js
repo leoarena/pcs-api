@@ -21,10 +21,12 @@ module.exports = {
       razao_social: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
       cnpj: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
       nome_fantasia: {
         type: Sequelize.STRING,
