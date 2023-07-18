@@ -5,6 +5,7 @@ const {
   updateOneDeposito,
   updateStatus,
   listDepositos,
+  listOneDeposito,
 } = require("../controllers/deposito.controller");
 
 class DepositoRouter {
@@ -18,6 +19,7 @@ class DepositoRouter {
       updateStatus
     );
     depositoRoutes.get("/depositos", auth, listDepositos);
+    depositoRoutes.get("/depositos/:identificador", auth, listOneDeposito);
     return depositoRoutes;
   }
 }

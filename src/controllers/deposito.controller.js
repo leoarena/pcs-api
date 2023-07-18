@@ -344,6 +344,15 @@ class DepositoController {
       return response.status(200).send({ depositosFiltrados });
     } else return response.status(200).send({ depositos });
   }
+
+  async listOneDeposito(request, response) {
+    const { identificador } = request.params;
+    const deposito = await Deposito.findOne({ where: { identificador } });
+
+    if (!deposito)
+      return response.status(404).send({ message: "Depósito não encontrado." });
+    else return response.status(200).send(deposito);
+  }
 }
 
 module.exports = new DepositoController();
