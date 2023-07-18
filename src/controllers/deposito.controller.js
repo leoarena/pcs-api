@@ -292,6 +292,37 @@ class DepositoController {
       });
     }
   }
+
+  async updateStatus(request, response) {
+    try {
+      const { identificador } = request.params;
+      const { status } = request.body;
+
+      const deposito = await Deposito.findOne({ where: { identificador } });
+      if (!deposito)
+        return response
+          .status(404)
+          .send({ message: "Depósito não encontrado." });
+
+      if (!status)
+        return response
+          .status(400)
+          .send({ message: "O campo status é obrigatório." });
+
+      const statusValido = status === "Ativo" || status === "Inativo";
+      if (!statusValido)
+        return response.status(400).send({ message: "Status inválido." });
+
+      await deposito.update({ status }, { where: { identificador } });
+
+      return response.status(204).send();
+    } catch (error) {
+      return response.status(400).send({
+        message: "Não foi possível atualizar o status do depósito.",
+        cause: error.message,
+      });
+    }
+  }
 }
 
 module.exports = new DepositoController();

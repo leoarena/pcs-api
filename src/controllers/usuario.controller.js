@@ -205,7 +205,7 @@ class UsuarioController {
       if (!statusValido)
         return response.status(400).send({ message: "Status inválido." });
 
-      await usuario.update({ status }, { where: { status } });
+      await usuario.update({ status }, { where: { identificador } });
 
       return response
         .status(200)
