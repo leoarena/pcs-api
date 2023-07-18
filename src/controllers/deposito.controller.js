@@ -323,6 +323,27 @@ class DepositoController {
       });
     }
   }
+
+  async listDepositos(request, response) {
+    const { status } = request.query;
+    const statusValido = status === "ATIVO" || status === "INATIVO";
+    let statusConvertido = null;
+    const depositos = await Deposito.findAll();
+
+    if (status === "ATIVO") {
+      statusConvertido = "Ativo";
+    }
+    if (status === "INATIVO") {
+      statusConvertido = "Inativo";
+    }
+
+    if (statusValido) {
+      const depositosFiltrados = await Deposito.findAll({
+        where: { status: statusConvertido },
+      });
+      return response.status(200).send({ depositosFiltrados });
+    } else return response.status(200).send({ depositos });
+  }
 }
 
 module.exports = new DepositoController();
