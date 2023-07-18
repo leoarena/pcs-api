@@ -1,6 +1,7 @@
 const { sign } = require("jsonwebtoken");
 const { Usuario } = require("../models/usuario");
 const { secret } = require("../config/database.config");
+const { where } = require("sequelize");
 
 class UsuarioController {
   async createOneUsuario(request, response) {
@@ -180,6 +181,39 @@ class UsuarioController {
     } catch (error) {
       return response.status(400).send({
         message: "Não foi possível atualizar o usuário.",
+        cause: error.message,
+      });
+    }
+  }
+
+  async updateStatus(request, response) {
+    try {
+      const { identificador } = request.params;
+      const { status } = request.body;
+
+      const usuario = await Usuario.findOne({ where: { identificador } });
+      if (!usuario)
+        return response
+          .status(404)
+          .send({ message: "Usuário não encontrado." });
+
+      if (!status)
+        return response
+          .status(400)
+          .send({ message: "O campo status é obrigatório." });
+
+      const statusValido = status === "Ativo" || status === "Inativo";
+      if (!statusValido)
+        return response.status(400).send({ message: "Status inválido." });
+
+      await usuario.update({ status }, { where: { status } });
+
+      return response
+        .status(200)
+        .send({ message: "Status atualizado com sucesso.", usuario });
+    } catch (error) {
+      return response.status(400).send({
+        message: "Não foi possível atualizar o status do usuário.",
         cause: error.message,
       });
     }
