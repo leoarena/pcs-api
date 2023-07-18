@@ -6,6 +6,7 @@ const {
   updateStatus,
   listDepositos,
   listOneDeposito,
+  deleteOneDeposito,
 } = require("../controllers/deposito.controller");
 
 class DepositoRouter {
@@ -20,6 +21,7 @@ class DepositoRouter {
     );
     depositoRoutes.get("/depositos", auth, listDepositos);
     depositoRoutes.get("/depositos/:identificador", auth, listOneDeposito);
+    depositoRoutes.delete("/depositos/:identificador", auth, deleteOneDeposito);
     return depositoRoutes;
   }
 }

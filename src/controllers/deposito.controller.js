@@ -353,6 +353,21 @@ class DepositoController {
       return response.status(404).send({ message: "Depósito não encontrado." });
     else return response.status(200).send(deposito);
   }
+
+  async deleteOneDeposito(request, response) {
+    const { identificador } = request.params;
+    const deposito = await Deposito.findOne({ where: { identificador } });
+
+    if (!deposito)
+      return response.status(404).send({ message: "Depósito não encontrado." });
+
+    if (deposito.status === "Ativo")
+      return response
+        .status(400)
+        .send({ message: "Não é possível excluir um depósito ativo." });
+    else await Deposito.destroy({ where: { identificador } });
+    return response.status(204).send();
+  }
 }
 
 module.exports = new DepositoController();
