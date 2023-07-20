@@ -361,7 +361,8 @@ class DepositoController {
       return response
         .status(400)
         .send({ message: "Não é possível excluir um depósito ativo." });
-    else await Deposito.destroy({ where: { identificador } });
+
+    await Deposito.destroy({ where: { identificador } });
     return response.status(204).send();
   }
 }
