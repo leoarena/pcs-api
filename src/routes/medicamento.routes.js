@@ -5,6 +5,7 @@ const {
   updateOneMedicamento,
   listMedicamentos,
   listOneMedicamento,
+  deleteOneMedicamento,
 } = require("../controllers/medicamento.controller.");
 
 class MedicamentoRouter {
@@ -21,6 +22,11 @@ class MedicamentoRouter {
       "/medicamentos/:identificador",
       auth,
       listOneMedicamento
+    );
+    medicamentoRoutes.delete(
+      "/medicamentos/:identificador",
+      auth,
+      deleteOneMedicamento
     );
     return medicamentoRoutes;
   }

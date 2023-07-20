@@ -168,6 +168,19 @@ class MedicamentoController {
         .send({ message: "Medicamento não encontrado." });
     return response.status(200).send(medicamento);
   }
+
+  async deleteOneMedicamento(request, response) {
+    const { identificador } = request.params;
+    const medicamento = await Medicamento.findOne({ where: { identificador } });
+
+    if (!medicamento)
+      return response
+        .status(404)
+        .send({ message: "Medicamento não encontrado." });
+
+    await Medicamento.destroy({ where: { identificador } });
+    return response.status(204).send();
+  }
 }
 
 module.exports = new MedicamentoController();
