@@ -1,4 +1,3 @@
-const { where } = require("sequelize");
 const { Medicamento } = require("../models/medicamento");
 
 class MedicamentoController {
@@ -157,6 +156,17 @@ class MedicamentoController {
       });
       return response.status(200).send({ medicamentosFiltrados });
     } else return response.status(200).send({ medicamentos });
+  }
+
+  async listOneMedicamento(request, response) {
+    const { identificador } = request.params;
+    const medicamento = await Medicamento.findOne({ where: { identificador } });
+
+    if (!medicamento)
+      return response
+        .status(404)
+        .send({ message: "Medicamento não encontrado." });
+    return response.status(200).send(medicamento);
   }
 }
 

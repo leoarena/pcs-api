@@ -4,6 +4,7 @@ const {
   createOneMedicamento,
   updateOneMedicamento,
   listMedicamentos,
+  listOneMedicamento,
 } = require("../controllers/medicamento.controller.");
 
 class MedicamentoRouter {
@@ -16,6 +17,11 @@ class MedicamentoRouter {
       updateOneMedicamento
     );
     medicamentoRoutes.get("/medicamentos", auth, listMedicamentos);
+    medicamentoRoutes.get(
+      "/medicamentos/:identificador",
+      auth,
+      listOneMedicamento
+    );
     return medicamentoRoutes;
   }
 }
