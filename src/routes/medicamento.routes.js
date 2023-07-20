@@ -3,6 +3,7 @@ const { auth } = require("../middlewares/auth");
 const {
   createOneMedicamento,
   updateOneMedicamento,
+  listMedicamentos,
 } = require("../controllers/medicamento.controller.");
 
 class MedicamentoRouter {
@@ -14,6 +15,7 @@ class MedicamentoRouter {
       auth,
       updateOneMedicamento
     );
+    medicamentoRoutes.get("/medicamentos", auth, listMedicamentos);
     return medicamentoRoutes;
   }
 }

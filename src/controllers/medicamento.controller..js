@@ -141,6 +141,23 @@ class MedicamentoController {
       });
     }
   }
+
+  async listMedicamentos(request, response) {
+    const { tipo } = request.query;
+    const tipoValido = tipo === "CONTROLADO" || tipo === "NAOCONTROLADO";
+    let tipoConvertido = null;
+    const medicamentos = await Medicamento.findAll();
+
+    if (tipo === "CONTROLADO") tipoConvertido = "Medicamento Controlado";
+    if (tipo === "NAOCONTROLADO") tipoConvertido = "Medicamento Não Controlado";
+
+    if (tipoValido) {
+      const medicamentosFiltrados = await Medicamento.findAll({
+        where: { tipo: tipoConvertido },
+      });
+      return response.status(200).send({ medicamentosFiltrados });
+    } else return response.status(200).send({ medicamentos });
+  }
 }
 
 module.exports = new MedicamentoController();
