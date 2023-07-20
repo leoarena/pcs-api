@@ -330,12 +330,8 @@ class DepositoController {
     let statusConvertido = null;
     const depositos = await Deposito.findAll();
 
-    if (status === "ATIVO") {
-      statusConvertido = "Ativo";
-    }
-    if (status === "INATIVO") {
-      statusConvertido = "Inativo";
-    }
+    if (status === "ATIVO") statusConvertido = "Ativo";
+    if (status === "INATIVO") statusConvertido = "Inativo";
 
     if (statusValido) {
       const depositosFiltrados = await Deposito.findAll({
@@ -351,7 +347,7 @@ class DepositoController {
 
     if (!deposito)
       return response.status(404).send({ message: "Depósito não encontrado." });
-    else return response.status(200).send(deposito);
+    return response.status(200).send(deposito);
   }
 
   async deleteOneDeposito(request, response) {
