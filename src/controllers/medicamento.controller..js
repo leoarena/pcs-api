@@ -79,7 +79,7 @@ class MedicamentoController {
     } catch (error) {
       return response.status(400).send({
         message: "Não foi possível cadastrar o medicamento.",
-        cause: error.message,
+        cause: error.errors[0].message || error.message,
       });
     }
   }
@@ -136,7 +136,7 @@ class MedicamentoController {
     } catch (error) {
       return response.status(400).send({
         message: "Não foi possível atualizar o medicamento.",
-        cause: error.message,
+        cause: error.errors[0].message || error.message,
       });
     }
   }
