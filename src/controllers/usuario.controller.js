@@ -17,52 +17,13 @@ class UsuarioController {
         status,
       } = request.body;
 
-      if (!nome)
-        return response
-          .status(400)
-          .send({ message: "O campo nome é obrigatório." });
-
-      if (!sobrenome)
-        return response
-          .status(400)
-          .send({ message: "O campo sobrenome é obrigatório." });
-
+      if (!nome) throw new Error("O campo nome é obrigatório.");
+      if (!sobrenome) throw new Error("O campo sobrenome é obrigatório.");
       if (!dataNascimento)
-        return response
-          .status(400)
-          .send({ message: "O campo data de nascimento é obrigatório." });
-
-      if (!cpf)
-        return response
-          .status(400)
-          .send({ message: "O campo CPF é obrigatório." });
-
-      const cpfExistente = await Usuario.findOne({ where: { cpf } });
-      if (cpfExistente)
-        return response.status(409).send({ message: "CPF já cadastrado." });
-
-      if (!email)
-        return response
-          .status(400)
-          .send({ message: "O campo email é obrigatório." });
-
-      const emailExistente = await Usuario.findOne({ where: { email } });
-      if (emailExistente)
-        return response.status(409).send({ message: "Email já cadastrado." });
-
-      if (!senha)
-        return response
-          .status(400)
-          .send({ message: "O campo senha é obrigatório." });
-
-      const senhaValida =
-        /(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,}/;
-
-      if (!senhaValida.test(senha))
-        return response.status(400).send({
-          message:
-            "A senha deve ter no mínimo 8 caracteres, sendo pelo menos 1 letra maiúscula, 1 número e 1 caractere especial.",
-        });
+        throw new Error("O campo data de nascimento é obrigatório.");
+      if (!cpf) throw new Error("O campo cpf é obrigatório.");
+      if (!email) throw new Error("O campo email é obrigatório.");
+      if (!senha) throw new Error("O campo senha é obrigatório.");
 
       const novoUsuario = await Usuario.create({
         nome,
@@ -80,9 +41,15 @@ class UsuarioController {
         .status(201)
         .send({ message: "Usuário cadastrado com sucesso.", novoUsuario });
     } catch (error) {
+      if (error.name === "SequelizeUniqueConstraintError" && error.fields.email)
+        return response.status(409).send({ message: error.message });
+
+      if (error.name === "SequelizeUniqueConstraintError" && error.fields.cpf)
+        return response.status(409).send({ message: error.message });
+
       return response.status(400).send({
         message: "Não foi possível cadastrar o usuário.",
-        cause: error.errors[0].message || error.message,
+        cause: error.message,
       });
     }
   }
