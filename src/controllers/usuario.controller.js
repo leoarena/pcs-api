@@ -82,7 +82,7 @@ class UsuarioController {
     } catch (error) {
       return response.status(400).send({
         message: "Não foi possível cadastrar o usuário.",
-        cause: error.message,
+        cause: error.errors[0].message || error.message,
       });
     }
   }
@@ -121,9 +121,10 @@ class UsuarioController {
         .status(200)
         .send({ message: "Login efetuado com sucesso.", token });
     } catch (error) {
-      return response
-        .status(400)
-        .send({ message: "Erro ao efetuar login.", cause: error.message });
+      return response.status(400).send({
+        message: "Erro ao efetuar login.",
+        cause: error.errors[0].message || error.message,
+      });
     }
   }
 
@@ -180,7 +181,7 @@ class UsuarioController {
     } catch (error) {
       return response.status(400).send({
         message: "Não foi possível atualizar o usuário.",
-        cause: error.message,
+        cause: error.errors[0].message || error.message,
       });
     }
   }
@@ -213,7 +214,7 @@ class UsuarioController {
     } catch (error) {
       return response.status(400).send({
         message: "Não foi possível atualizar o status do usuário.",
-        cause: error.message,
+        cause: error.errors[0].message || error.message,
       });
     }
   }
