@@ -126,7 +126,7 @@ class DepositoController {
     } catch (error) {
       return response.status(400).send({
         message: "Não foi possível cadastrar o depósito.",
-        cause: error.message,
+        cause: error.errors[0].message || error.message,
       });
     }
   }
@@ -288,7 +288,7 @@ class DepositoController {
     } catch (error) {
       return response.status(400).send({
         message: "Não foi possível atualizar o depósito.",
-        cause: error.message,
+        cause: error.errors[0].message || error.message,
       });
     }
   }
@@ -314,12 +314,11 @@ class DepositoController {
         return response.status(400).send({ message: "Status inválido." });
 
       await deposito.update({ status }, { where: { identificador } });
-
       return response.status(204).send();
     } catch (error) {
       return response.status(400).send({
         message: "Não foi possível atualizar o status do depósito.",
-        cause: error.message,
+        cause: error.errors[0].message || error.message,
       });
     }
   }
@@ -338,7 +337,9 @@ class DepositoController {
         where: { status: statusConvertido },
       });
       return response.status(200).send({ depositosFiltrados });
-    } else return response.status(200).send({ depositos });
+    }
+
+    return response.status(200).send({ depositos });
   }
 
   async listOneDeposito(request, response) {
