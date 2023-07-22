@@ -42,10 +42,16 @@ class UsuarioController {
         .send({ message: "Usuário cadastrado com sucesso.", novoUsuario });
     } catch (error) {
       if (error.name === "SequelizeUniqueConstraintError" && error.fields.email)
-        return response.status(409).send({ message: error.message });
+        return response.status(409).send({
+          message: "Não foi possível cadastrar o usuário.",
+          cause: error.message,
+        });
 
       if (error.name === "SequelizeUniqueConstraintError" && error.fields.cpf)
-        return response.status(409).send({ message: error.message });
+        return response.status(409).send({
+          message: "Não foi possível cadastrar o usuário.",
+          cause: error.message,
+        });
 
       return response.status(400).send({
         message: "Não foi possível cadastrar o usuário.",
@@ -58,39 +64,33 @@ class UsuarioController {
     try {
       const { email, senha } = request.body;
 
-      if (!email)
-        return response
-          .status(400)
-          .send({ message: "O campo email é obrigatório." });
-
-      if (!senha)
-        return response
-          .status(400)
-          .send({ message: "O campo senha é obrigatório." });
+      if (!email) throw new Error("O campo email é obrigatório.");
+      if (!senha) throw new Error("O campo senha é obrigatório.");
 
       const usuario = await Usuario.findOne({ where: { email } });
-      if (!usuario)
-        return response.status(404).send({ message: "Email não encontrado." });
-
-      const senhaCorreta = senha === usuario.senha;
-      if (!senhaCorreta)
-        return response.status(400).send({ message: "Senha incorreta." });
+      if (!usuario) throw new Error("Email não encontrado.");
+      if (senha !== usuario.senha) throw new Error("Senha incorreta.");
 
       const payload = {
         identificador: usuario.identificador,
         email: usuario.email,
         nome: usuario.nome,
       };
-
       const token = sign(payload, secret, { expiresIn: "1d" });
 
       return response
         .status(200)
         .send({ message: "Login efetuado com sucesso.", token });
     } catch (error) {
+      if (error.message === "Email não encontrado.")
+        return response.status(404).send({
+          message: "Erro ao efetuar login.",
+          cause: error.message,
+        });
+
       return response.status(400).send({
         message: "Erro ao efetuar login.",
-        cause: error.errors[0].message || error.message,
+        cause: error.message,
       });
     }
   }
