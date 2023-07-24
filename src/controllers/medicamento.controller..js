@@ -70,38 +70,22 @@ class MedicamentoController {
       const medicamento = await Medicamento.findOne({
         where: { identificador },
       });
-
-      if (!medicamento)
-        return response
-          .status(404)
-          .send({ message: "Medicamento não encontrado." });
+      if (!medicamento) throw new Error("Medicamento não encontrado.");
 
       if (!descricao && !precoUnitario && !quantidade)
-        return response
-          .status(400)
-          .send({ message: "Pelo menos um dos campos deve ser editado." });
+        throw new Error("Pelo menos um dos campos deve ser editado.");
 
-      const descricaoValida =
-        typeof descricao === "string" || typeof descricao === "undefined";
-      if (!descricaoValida)
-        return response
-          .status(400)
-          .send({ message: "O campo descrição precisa ser do tipo string." });
+      if (typeof descricao !== "string" && typeof descricao !== "undefined")
+        throw new Error("O campo descrição precisa ser do tipo string.");
 
-      const precoUnitarioValido =
-        typeof precoUnitario === "number" ||
-        typeof precoUnitario === "undefined";
-      if (!precoUnitarioValido)
-        return response.status(400).send({
-          message: "O campo preço unitário precisa ser do tipo number.",
-        });
+      if (
+        typeof precoUnitario !== "number" &&
+        typeof precoUnitario !== "undefined"
+      )
+        throw new Error("O campo preço unitário precisa ser do tipo number.");
 
-      const quantidadeValida =
-        typeof quantidade === "number" || typeof quantidade === "undefined";
-      if (!quantidadeValida)
-        return response
-          .status(400)
-          .send({ message: "O campo quantidade precisa ser do tipo number." });
+      if (typeof quantidade !== "number" && typeof quantidade !== "undefined")
+        throw new Error("O campo quantidade precisa ser do tipo number.");
 
       await medicamento.update(
         { descricao, precoUnitario, quantidade },
@@ -112,9 +96,15 @@ class MedicamentoController {
         .status(200)
         .send({ message: "Medicamento atualizado com sucesso.", medicamento });
     } catch (error) {
+      if (error.message === "Medicamento não encontrado.")
+        return response.status(404).send({
+          message: "Não foi possível atualizar o medicamento.",
+          cause: error.message,
+        });
+
       return response.status(400).send({
         message: "Não foi possível atualizar o medicamento.",
-        cause: error.errors[0].message || error.message,
+        cause: error.message,
       });
     }
   }
