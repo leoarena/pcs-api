@@ -138,19 +138,12 @@ class UsuarioController {
       const { status } = request.body;
 
       const usuario = await Usuario.findOne({ where: { identificador } });
-      if (!usuario)
-        return response
-          .status(404)
-          .send({ message: "Usuário não encontrado." });
+      if (!usuario) throw new Error("Usuário não encontrado.");
 
-      if (!status)
-        return response
-          .status(400)
-          .send({ message: "O campo status é obrigatório." });
+      if (!status) throw new Error("O campo status é obrigatório.");
 
-      const statusValido = status === "Ativo" || status === "Inativo";
-      if (!statusValido)
-        return response.status(400).send({ message: "Status inválido." });
+      if (status !== "Ativo" && status !== "Inativo")
+        throw new Error("Status inválido.");
 
       await usuario.update({ status }, { where: { identificador } });
 
@@ -158,9 +151,15 @@ class UsuarioController {
         .status(200)
         .send({ message: "Status atualizado com sucesso.", usuario });
     } catch (error) {
+      if (error.message === "Usuário não encontrado.")
+        return response.status(404).send({
+          message: "Não foi possível atualizar o status do usuário.",
+          cause: error.message,
+        });
+
       return response.status(400).send({
         message: "Não foi possível atualizar o status do usuário.",
-        cause: error.errors[0].message || error.message,
+        cause: error.message,
       });
     }
   }
