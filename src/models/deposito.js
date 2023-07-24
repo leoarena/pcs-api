@@ -21,12 +21,12 @@ const Deposito = connection.define(
     razaoSocial: {
       type: STRING,
       allowNull: false,
-      unique: true,
+      unique: { msg: "Razão social já cadastrada." },
     },
     cnpj: {
       type: STRING,
       allowNull: false,
-      unique: true,
+      unique: { msg: "CNPJ já cadastrado." },
     },
     nomeFantasia: {
       type: STRING,
@@ -35,9 +35,9 @@ const Deposito = connection.define(
     email: {
       type: STRING,
       allowNull: false,
-      unique: true,
+      unique: { msg: "Email já cadastrado." },
       validate: {
-        isEmail: true,
+        isEmail: { msg: "Email inválido." },
       },
     },
     telefone: {

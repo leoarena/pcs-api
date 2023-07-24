@@ -23,82 +23,20 @@ class DepositoController {
         status,
       } = request.body;
 
-      if (!usuarioId)
-        return response
-          .status(400)
-          .send({ message: "O campo usuário id é obrigatório." });
-
-      if (!razaoSocial)
-        return response
-          .status(400)
-          .send({ message: "O campo razão social é obrigatório." });
-
-      const razaoSocialExistente = await Deposito.findOne({
-        where: { razaoSocial },
-      });
-      if (razaoSocialExistente)
-        return response
-          .status(409)
-          .send({ message: "Razão social já cadastrado." });
-
-      if (!cnpj)
-        return response
-          .status(400)
-          .send({ message: "O campo CNPJ é obrigatório." });
-
-      const cnpjExistente = await Deposito.findOne({ where: { cnpj } });
-      if (cnpjExistente)
-        return response.status(409).send({ message: "CNPJ já cadastrado." });
-
+      if (!usuarioId) throw new Error("O campo usuário id é obrigatório.");
+      if (!razaoSocial) throw new Error("O campo razão social é obrigatório.");
+      if (!cnpj) throw new Error("O campo CNPJ é obrigatório.");
       if (!nomeFantasia)
-        return response
-          .status(400)
-          .send({ message: "O campo nome fantasia é obrigatório." });
-
-      if (!email)
-        return response
-          .status(400)
-          .send({ message: "O campo email é obrigatório." });
-
-      if (!celular)
-        return response
-          .status(400)
-          .send({ message: "O campo celular é obrigatório." });
-
-      if (!cep)
-        return response
-          .status(400)
-          .send({ message: "O campo cep é obrigatório." });
-
-      if (!logradouro)
-        return response
-          .status(400)
-          .send({ message: "O campo logradouro é obrigatório." });
-
-      if (!numero)
-        return response
-          .status(400)
-          .send({ message: "O campo numero é obrigatório." });
-
-      if (!bairro)
-        return response
-          .status(400)
-          .send({ message: "O campo bairro é obrigatório." });
-
-      if (!cidade)
-        return response
-          .status(400)
-          .send({ message: "O campo cidade é obrigatório." });
-
-      if (!estado)
-        return response
-          .status(400)
-          .send({ message: "O campo estado é obrigatório." });
-
-      if (!status)
-        return response
-          .status(400)
-          .send({ message: "O campo status é obrigatório." });
+        throw new Error("O campo nome fantasia é obrigatório.");
+      if (!email) throw new Error("O campo email é obrigatório.");
+      if (!celular) throw new Error("O campo celular é obrigatório.");
+      if (!cep) throw new Error("O campo cep é obrigatório.");
+      if (!logradouro) throw new Error("O campo logradouro é obrigatório.");
+      if (!numero) throw new Error("O campo número é obrigatório.");
+      if (!bairro) throw new Error("O campo bairro é obrigatório.");
+      if (!cidade) throw new Error("O campo cidade é obrigatório.");
+      if (!estado) throw new Error("O campo estado é obrigatório.");
+      if (!status) throw new Error("O campo status é obrigatório.");
 
       const novoDeposito = await Deposito.create({
         usuarioId,
@@ -124,9 +62,30 @@ class DepositoController {
         .status(201)
         .send({ message: "Depósito cadastrado com sucesso.", novoDeposito });
     } catch (error) {
+      if (
+        error.name === "SequelizeUniqueConstraintError" &&
+        error.fields.razao_social
+      )
+        return response.status(409).send({
+          message: "Não foi possível cadastrar o depósito.",
+          cause: error.message,
+        });
+
+      if (error.name === "SequelizeUniqueConstraintError" && error.fields.cnpj)
+        return response.status(409).send({
+          message: "Não foi possível cadastrar o depósito.",
+          cause: error.message,
+        });
+
+      if (error.name === "SequelizeUniqueConstraintError" && error.fields.email)
+        return response.status(409).send({
+          message: "Não foi possível cadastrar o depósito.",
+          cause: error.message,
+        });
+
       return response.status(400).send({
         message: "Não foi possível cadastrar o depósito.",
-        cause: error.errors[0].message || error.message,
+        cause: error.message,
       });
     }
   }
