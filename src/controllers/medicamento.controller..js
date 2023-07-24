@@ -17,47 +17,16 @@ class MedicamentoController {
       } = request.body;
 
       if (!nomeMedicamento)
-        return response
-          .status(400)
-          .send({ message: "O campo nome do medicamento é obrigatório." });
-
-      const nomeExistente = await Medicamento.findOne({
-        where: { nomeMedicamento },
-      });
-      if (nomeExistente)
-        return response
-          .status(409)
-          .send({ message: "Nome do medicamento já cadastrado." });
-
+        throw new Error("O campo nome do medicamento é obrigatório.");
       if (!nomeLaboratorio)
-        return response
-          .status(400)
-          .send({ message: "O campo nome do laboratório é obrigatório." });
-
-      if (!dosagem)
-        return response
-          .status(400)
-          .send({ message: "O campo dosagem é obrigatório." });
-
+        throw new Error("O campo nome do laboratório é obrigatório.");
+      if (!dosagem) throw new Error("O campo dosagem é obrigatório.");
       if (!unidadeDosagem)
-        return response
-          .status(400)
-          .send({ message: "O campo unidade da dosagem é obrigatório." });
-
-      if (!tipo)
-        return response
-          .status(400)
-          .send({ message: "O campo tipo é obrigatório." });
-
+        throw new Error("O campo unidade da dosagem é obrigatório.");
+      if (!tipo) throw new Error("O campo tipo é obrigatório.");
       if (!precoUnitario)
-        return response
-          .status(400)
-          .send({ message: "O campo preço unitário é obrigatório." });
-
-      if (!quantidade)
-        return response
-          .status(400)
-          .send({ message: "O campo quantidade é obrigatório." });
+        throw new Error("O campo preço unitário é obrigatório.");
+      if (!quantidade) throw new Error("O campo quantidade é obrigatório.");
 
       const novoMedicamento = await Medicamento.create({
         usuarioId,
@@ -77,9 +46,18 @@ class MedicamentoController {
         novoMedicamento,
       });
     } catch (error) {
+      if (
+        error.name === "SequelizeUniqueConstraintError" &&
+        error.fields.nome_medicamento
+      )
+        return response.status(409).send({
+          message: "Não foi possível cadastrar o medicamento.",
+          cause: error.message,
+        });
+
       return response.status(400).send({
         message: "Não foi possível cadastrar o medicamento.",
-        cause: error.errors[0].message || error.message,
+        cause: error.message,
       });
     }
   }

@@ -29,6 +29,7 @@ const Medicamento = connection.define(
     nomeMedicamento: {
       type: STRING,
       allowNull: false,
+      unique: { msg: "Nome do medicamento já cadastrado." },
     },
     nomeLaboratorio: {
       type: STRING,

@@ -29,6 +29,7 @@ module.exports = {
       nome_medicamento: {
         type: Sequelize.STRING,
         allowNull: false,
+        unique: true,
       },
       nome_laboratorio: {
         type: Sequelize.STRING,
