@@ -258,19 +258,30 @@ class DepositoController {
   }
 
   async deleteOneDeposito(request, response) {
-    const { identificador } = request.params;
-    const deposito = await Deposito.findOne({ where: { identificador } });
+    try {
+      const { identificador } = request.params;
+      const deposito = await Deposito.findOne({ where: { identificador } });
 
-    if (!deposito)
-      return response.status(404).send({ message: "Depósito não encontrado." });
+      if (!deposito) throw new Error("Depósito não encontrado.");
 
-    if (deposito.status === "Ativo")
-      return response
-        .status(400)
-        .send({ message: "Não é possível excluir um depósito ativo." });
+      if (deposito.status === "Ativo")
+        throw new Error("Não é possível excluir um depósito ativo.");
 
-    await Deposito.destroy({ where: { identificador } });
-    return response.status(204).send();
+      await Deposito.destroy({ where: { identificador } });
+
+      return response.status(204).send();
+    } catch (error) {
+      if (error.message === "Depósito não encontrado.")
+        return response.status(404).send({
+          message: "Não foi possível excluir o depósito.",
+          cause: error.message,
+        });
+
+      return response.status(400).send({
+        message: "Não foi possível excluir o depósito.",
+        cause: error.message,
+      });
+    }
   }
 }
 
