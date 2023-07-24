@@ -170,32 +170,23 @@ class UsuarioController {
       const { senha } = request.body;
 
       const usuario = await Usuario.findOne({ where: { identificador } });
-      if (!usuario)
-        return response
-          .status(404)
-          .send({ message: "Usuário não encontrado." });
+      if (!usuario) throw new Error("Usuário não encontrado.");
 
-      if (!senha)
-        return response
-          .status(400)
-          .send({ message: "O campo senha é obrigatório." });
-
-      const senhaValida =
-        /(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,}/;
-
-      if (!senhaValida.test(senha))
-        return response.status(400).send({
-          message:
-            "A senha deve ter no mínimo 8 caracteres, sendo pelo menos 1 letra maiúscula, 1 número e 1 caractere especial.",
-        });
+      if (!senha) throw new Error("O campo senha é obrigatório.");
 
       await usuario.update({ senha }, { where: { identificador } });
 
       return response.status(204).send();
     } catch (error) {
+      if (error.message === "Usuário não encontrado.")
+        return response.status(404).send({
+          message: "Não foi possível alterar a senha do usuário.",
+          cause: error.message,
+        });
+
       return response.status(400).send({
         message: "Não foi possível alterar a senha do usuário.",
-        cause: message.error,
+        cause: error.message,
       });
     }
   }
