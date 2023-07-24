@@ -123,7 +123,9 @@ class MedicamentoController {
         where: { tipo: tipoConvertido },
       });
       return response.status(200).send({ medicamentosFiltrados });
-    } else return response.status(200).send({ medicamentos });
+    }
+
+    return response.status(200).send({ medicamentos });
   }
 
   async listOneMedicamento(request, response) {
