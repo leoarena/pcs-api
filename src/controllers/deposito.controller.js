@@ -205,26 +205,26 @@ class DepositoController {
       const { status } = request.body;
 
       const deposito = await Deposito.findOne({ where: { identificador } });
-      if (!deposito)
-        return response
-          .status(404)
-          .send({ message: "Depósito não encontrado." });
+      if (!deposito) throw new Error("Depósito não encontrado.");
 
-      if (!status)
-        return response
-          .status(400)
-          .send({ message: "O campo status é obrigatório." });
+      if (!status) throw new Error("O campo status é obrigatório.");
 
-      const statusValido = status === "Ativo" || status === "Inativo";
-      if (!statusValido)
-        return response.status(400).send({ message: "Status inválido." });
+      if (status !== "Ativo" && status !== "Inativo")
+        throw new Error("Status inválido.");
 
       await deposito.update({ status }, { where: { identificador } });
+
       return response.status(204).send();
     } catch (error) {
+      if (error.message === "Depósito não encontrado.")
+        return response.status(404).send({
+          message: "Não foi possível atualizar o status do depósito.",
+          cause: error.message,
+        });
+
       return response.status(400).send({
         message: "Não foi possível atualizar o status do depósito.",
-        cause: error.errors[0].message || error.message,
+        cause: error.message,
       });
     }
   }
