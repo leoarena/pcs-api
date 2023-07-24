@@ -140,16 +140,29 @@ class MedicamentoController {
   }
 
   async deleteOneMedicamento(request, response) {
-    const { identificador } = request.params;
-    const medicamento = await Medicamento.findOne({ where: { identificador } });
+    try {
+      const { identificador } = request.params;
+      const medicamento = await Medicamento.findOne({
+        where: { identificador },
+      });
 
-    if (!medicamento)
-      return response
-        .status(404)
-        .send({ message: "Medicamento não encontrado." });
+      if (!medicamento) throw new Error("Medicamento não encontrado.");
 
-    await Medicamento.destroy({ where: { identificador } });
-    return response.status(204).send();
+      await Medicamento.destroy({ where: { identificador } });
+
+      return response.status(204).send();
+    } catch (error) {
+      if (error.message === "Medicamento não encontrado.")
+        return response.status(404).send({
+          message: "Não foi possível excluir o medicamento.",
+          cause: error.message,
+        });
+
+      return response.status(400).send({
+        message: "Não foi possível excluir o medicamento.",
+        cause: error.message,
+      });
+    }
   }
 }
 
