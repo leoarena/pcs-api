@@ -21,7 +21,7 @@ class UsuarioController {
       if (!sobrenome) throw new Error("O campo sobrenome é obrigatório.");
       if (!dataNascimento)
         throw new Error("O campo data de nascimento é obrigatório.");
-      if (!cpf) throw new Error("O campo cpf é obrigatório.");
+      if (!cpf) throw new Error("O campo CPF é obrigatório.");
       if (!email) throw new Error("O campo email é obrigatório.");
       if (!senha) throw new Error("O campo senha é obrigatório.");
 
@@ -125,6 +125,12 @@ class UsuarioController {
 
       return response.status(204).send();
     } catch (error) {
+      if (error.message === "Usuário não encontrado.")
+        return response.status(404).send({
+          message: "Não foi possível atualizar o usuário.",
+          cause: error.message,
+        });
+
       return response.status(400).send({
         message: "Não foi possível atualizar o usuário.",
         cause: error.message,
