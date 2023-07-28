@@ -1,4 +1,5 @@
 const { Deposito } = require("../models/deposito");
+const { Medicamento } = require("../models/medicamento");
 
 class DepositoController {
   async createOneDeposito(request, response) {
@@ -30,7 +31,7 @@ class DepositoController {
         throw new Error("O campo nome fantasia é obrigatório.");
       if (!email) throw new Error("O campo email é obrigatório.");
       if (!celular) throw new Error("O campo celular é obrigatório.");
-      if (!cep) throw new Error("O campo cep é obrigatório.");
+      if (!cep) throw new Error("O campo CEP é obrigatório.");
       if (!logradouro) throw new Error("O campo logradouro é obrigatório.");
       if (!numero) throw new Error("O campo número é obrigatório.");
       if (!bairro) throw new Error("O campo bairro é obrigatório.");
@@ -192,6 +193,12 @@ class DepositoController {
 
       return response.status(204).send();
     } catch (error) {
+      if (error.message === "Depósito não encontrado.")
+        return response.status(404).send({
+          message: "Não foi possível atualizar o depósito.",
+          cause: error.message,
+        });
+
       return response.status(400).send({
         message: "Não foi possível atualizar o depósito.",
         cause: error.message,
@@ -254,7 +261,7 @@ class DepositoController {
 
     if (!deposito)
       return response.status(404).send({ message: "Depósito não encontrado." });
-    return response.status(200).send(deposito);
+    return response.status(200).send({ deposito });
   }
 
   async deleteOneDeposito(request, response) {
@@ -266,6 +273,13 @@ class DepositoController {
 
       if (deposito.status === "Ativo")
         throw new Error("Não é possível excluir um depósito ativo.");
+
+      const medicamentosNoDeposito = await Medicamento.count({
+        where: { depositoId: deposito.identificador },
+      });
+
+      if (medicamentosNoDeposito > 0)
+        throw new Error("Não é possível excluir um depósito com medicamentos.");
 
       await Deposito.destroy({ where: { identificador } });
 
