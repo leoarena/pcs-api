@@ -16,6 +16,8 @@ class MedicamentoController {
         quantidade,
       } = request.body;
 
+      if (!usuarioId) throw new Error("O campo usuário id é obrigatório.");
+      if (!depositoId) throw new Error("O campo depósito id é obrigatório.");
       if (!nomeMedicamento)
         throw new Error("O campo nome do medicamento é obrigatório.");
       if (!nomeLaboratorio)
@@ -64,8 +66,8 @@ class MedicamentoController {
 
   async updateOneMedicamento(request, response) {
     try {
-      const { descricao, precoUnitario, quantidade } = request.body;
       const { identificador } = request.params;
+      const { descricao, precoUnitario, quantidade } = request.body;
 
       const medicamento = await Medicamento.findOne({
         where: { identificador },
@@ -136,7 +138,7 @@ class MedicamentoController {
       return response
         .status(404)
         .send({ message: "Medicamento não encontrado." });
-    return response.status(200).send(medicamento);
+    return response.status(200).send({ medicamento });
   }
 
   async deleteOneMedicamento(request, response) {
